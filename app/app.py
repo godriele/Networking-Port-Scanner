@@ -20,6 +20,7 @@ import socket
 
 target = '127.0.0.1' # Local Machine IP Address
 
+# Function to scan a single port on the target 
 def portscan(port):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,15 +41,17 @@ def portscan(port):
         
 
 from queue import Queue # Queueing the port numbers, everytime I get a port, it will shift to a new one
-import threading 
+import threading # For creating and managing threads
 
 queue = Queue()
 open_ports = []
 
+# Function to fill the queue with port numbers from the given port list
 def fill_queue(port_list):
     for port in port_list:
-        queue.put(port)
+        queue.put(port) # Add each port in the list to the queue
         
+# Worker function for threads to scan ports
 def worker():
     while not queue.empty():
         port = queue.get()
@@ -58,3 +61,23 @@ def worker():
         else:
             print("Port {} is closed!".format(port))
     
+
+port_list = range(1, 104)
+fill_queue(port_list) # Fill the queue with these ports 
+
+thread_list = []
+
+# Create 100 threads, each running the worker function 
+for t in range(100):
+    thread = threading.Thread(target=worker) # Creates a thread with target as the worker function 
+    thread_list.append(thread)
+    
+# Start all threads
+for thread in thread_list:
+    thread.start()
+    
+# Wait for all threads to complete    
+for thread in thread_list:
+    thread.join()
+    
+print("Open ports are: ", open_ports)
