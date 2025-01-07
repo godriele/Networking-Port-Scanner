@@ -29,3 +29,10 @@ def portscan(port):
         return False
 
 # print(portscan(80))
+
+for port in range(1, 1024):
+    result = portscan(port)
+    if(result):
+        print("Port {} is open!".format(port))
+    else:
+        print("Port {} is closed!".format(port))
